@@ -1,0 +1,5 @@
+http://localhost:8080/WeatherForecast
+
+echo "GET http://localhost:8080/WeatherForecast" | vegeta attack -rate=50 -duration=90s | vegeta report
+echo "GET http://localhost:8080/WeatherForecast/city" | vegeta attack -rate=50 -duration=90s | vegeta report
+echo "GET http://localhost:8080/WeatherForecast/country" | vegeta attack -rate=500 -duration=30s | vegeta report

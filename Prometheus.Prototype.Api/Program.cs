@@ -1,6 +1,7 @@
 using Prometheus.Prototype.Api;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
+using Serilog.Sinks.Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, configuration) =>
@@ -13,9 +14,11 @@ builder.Host.UseSerilog((context, configuration) =>
       .WriteTo
         .Console()
       .WriteTo
+        .Prometheus("events_{0}", "{0}")
+      .WriteTo
         .Elasticsearch(new ElasticsearchSinkOptions(new Uri(context.Configuration["ElasticConfigurarion:Uri"]))
         {
-            IndexFormat = $"{context.Configuration["ApplicationName"]}-logs-{context.HostingEnvironment.EnvironmentName?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}",
+            IndexFormat = $"prometheusprototype-logs-{DateTime.UtcNow:yyyy-MM}",
             AutoRegisterTemplate = true,
             NumberOfShards = 2,
             NumberOfReplicas = 1
@@ -24,7 +27,6 @@ builder.Host.UseSerilog((context, configuration) =>
         .WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
       .ReadFrom
         .Configuration(context.Configuration);
-
 });
 
 

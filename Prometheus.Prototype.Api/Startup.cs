@@ -5,7 +5,7 @@ namespace Prometheus.Prototype.Api
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        public static IDisposable Collector;
+        public static IDisposable? Collector;
 
         public Startup(IConfiguration configuration)
         {
@@ -46,6 +46,7 @@ namespace Prometheus.Prototype.Api
                 .WithGcStats(CaptureLevel.Verbose)
                 .WithThreadPoolStats(CaptureLevel.Informational)
                 .WithExceptionStats(CaptureLevel.Errors)
+                .WithSocketStats()
                 .WithJitStats();
 
             builder.RecycleCollectorsEvery(new TimeSpan(0, 20, 0));

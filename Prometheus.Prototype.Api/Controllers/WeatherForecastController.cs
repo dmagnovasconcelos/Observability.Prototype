@@ -42,7 +42,7 @@ public class WeatherForecastController : ControllerBase
         catch (Exception ex)
         {
             _logger.Error(ex, "Something bad happened");
-            return StatusCode(500, ex);
+            return StatusCode(500, ex.Message);
         }
     }
 
