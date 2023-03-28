@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  website:
+    image: dmagnovasconcelos/dotnet-website:latest
+    ports:
+      - "8080:80"
+    networks:
+      - website
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - website
+    networks:
+      - website
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - website
+    
+networks:
+  website:
+    driver: bridge
