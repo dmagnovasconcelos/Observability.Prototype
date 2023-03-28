@@ -41,7 +41,6 @@ namespace Prometheus.Prototype.Api
 
         public static IDisposable CreateCollector()
         {
-            //var builder = DotNetRuntimeStatsBuilder.Default();
             var builder = DotNetRuntimeStatsBuilder.Customize()
                 .WithContentionStats(CaptureLevel.Informational)
                 .WithGcStats(CaptureLevel.Verbose)

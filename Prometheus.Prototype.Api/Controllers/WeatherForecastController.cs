@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Prometheus.Prototype.Api;
 
+using ILogger = Serilog.ILogger;
+
 namespace Second.Prototype.Api.Controllers;
 
 [ApiController]
@@ -12,6 +14,13 @@ public class WeatherForecastController : ControllerBase
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
+    private readonly ILogger _logger;
+
+    public WeatherForecastController(ILogger logger)
+    {
+        _logger = logger;
+    }
+
     [HttpGet(Name = "GetWeatherForecast")]
     public IActionResult Get()
     {
@@ -22,16 +31,17 @@ public class WeatherForecastController : ControllerBase
             {
                 throw new Exception("Oops what happened?");
             }
+
             return Ok(Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
                 TemperatureC = Random.Shared.Next(-20, 55),
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-                .ToArray());
+            }).ToArray());
         }
         catch (Exception ex)
         {
+            _logger.Error(ex, "Something bad happened");
             return StatusCode(500, ex);
         }
     }
@@ -50,6 +60,7 @@ public class WeatherForecastController : ControllerBase
         var rng = new Random().Next(0, 9);
         if (rng > 5)
         {
+            _logger.Warning("Access Unauthorized");
             return Unauthorized();
         }
 
