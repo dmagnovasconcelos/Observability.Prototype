@@ -20,7 +20,7 @@ namespace Prometheus.Prototype.Api
             services.AddSwaggerGen();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseSwagger();
             app.UseSwaggerUI();
@@ -30,8 +30,10 @@ namespace Prometheus.Prototype.Api
             app.UseHttpMetrics();
             app.UseMetricServer();
             app.UseStaticFiles();
-            app.UseAuthorization();
+
             app.UseRouting();
+            app.UseAuthorization();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -46,8 +48,8 @@ namespace Prometheus.Prototype.Api
                 .WithGcStats(CaptureLevel.Verbose)
                 .WithThreadPoolStats(CaptureLevel.Informational)
                 .WithExceptionStats(CaptureLevel.Errors)
-                .WithSocketStats()
-                .WithJitStats();
+                .WithJitStats(CaptureLevel.Informational)
+                .WithSocketStats();
 
             builder.RecycleCollectorsEvery(new TimeSpan(0, 20, 0));
 

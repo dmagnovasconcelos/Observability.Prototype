@@ -4,6 +4,8 @@ services:
   elasticsearch:
     container_name: es-container
     image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
+    volumes:
+      - ./elastic:/usr/share/elasticsearch/data  
     environment:
       - xpack.security.enabled=false
       - "discovery.type=single-node"
@@ -25,7 +27,10 @@ services:
       - website
 
   website:
-    image: dmagnovasconcelos/dotnet-website:v1.0
+    # image: dmagnovasconcelos/dotnet-website:v1.0
+    build: 
+      context: .
+      dockerfile: Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
     depends_on:
@@ -36,9 +41,11 @@ services:
       - website
 
   prometheus:
-    image: prom/prometheus:v2.43.0
+    image: prom/prometheus:latest
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./data/prometheus/config:/etc/prometheus/
+      - ./data/prometheus/data:/prometheus
     ports:
       - "9090:9090"
     depends_on:
@@ -48,6 +55,10 @@ services:
       
   grafana:
     image: grafana/grafana:latest
+    links:
+      - prometheus:prometheus
+    volumes:
+      - ./data/grafana:/var/lib/grafana
     ports:
       - "3000:3000"
     depends_on:

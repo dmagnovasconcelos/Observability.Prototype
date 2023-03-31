@@ -20,3 +20,4 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Prometheus.Prototype.Api.dll"]
+CMD ["dotnet-monitor collect --urls http://0.0.0.0:52323 --metricUrls http://0.0.0.0:52325 --no-auth"]
