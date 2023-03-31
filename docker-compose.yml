@@ -5,7 +5,7 @@ services:
     container_name: es-container
     image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
     volumes:
-      - ./elastic:/usr/share/elasticsearch/data  
+      - ./docker/elastic/data:/usr/share/elasticsearch/data  
     environment:
       - xpack.security.enabled=false
       - "discovery.type=single-node"
@@ -44,8 +44,8 @@ services:
     image: prom/prometheus:latest
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./data/prometheus/config:/etc/prometheus/
-      - ./data/prometheus/data:/prometheus
+      - ./docker/prometheus/config:/etc/prometheus/
+      - ./docker/prometheus/data:/prometheus
     ports:
       - "9090:9090"
     depends_on:
@@ -58,7 +58,7 @@ services:
     links:
       - prometheus:prometheus
     volumes:
-      - ./data/grafana:/var/lib/grafana
+      - ./docker/grafana/data:/var/lib/grafana
     ports:
       - "3000:3000"
     depends_on:
