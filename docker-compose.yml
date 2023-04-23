@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   elasticsearch:
-    container_name: es-container
+    container_name: observability-elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:8.6.2
     volumes:
       - ./docker/elastic/data:/usr/share/elasticsearch/data  
@@ -12,10 +12,10 @@ services:
     ports:
       - 9200:9200
     networks:
-      - website
+      - webapi
 
   kibana:
-    container_name: kb-container
+    container_name: observability-kibana
     image: docker.elastic.co/kibana/kibana:8.6.2
     environment:
       - ELASTICSEARCH_HOSTS=http://es-container:9200
@@ -24,13 +24,14 @@ services:
     ports:
       - 5601:5601
     networks:
-      - website
+      - webapi
 
-  website:
+  webapi:
     # image: dmagnovasconcelos/dotnet-website:v1.0
     build: 
       context: .
       dockerfile: Dockerfile
+    container_name: observability-webapi
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
     depends_on:
@@ -38,9 +39,10 @@ services:
     ports:
       - "8080:80"
     networks:
-      - website
+      - webapi
 
   prometheus:
+    container_name: observability-prometheus
     image: prom/prometheus:latest
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
@@ -49,11 +51,12 @@ services:
     ports:
       - "9090:9090"
     depends_on:
-      - website
+      - webapi
     networks:
-      - website
+      - webapi
       
   grafana:
+    container_name: observability-grafana
     image: grafana/grafana:latest
     links:
       - prometheus:prometheus
@@ -64,8 +67,27 @@ services:
     depends_on:
       - prometheus
     networks:
-      - website
+      - webapi
+
+  jaeger:
+    container_name: observability-jaeger
+    image: jaegertracing/all-in-one:latest
+    hostname: jaeger
+    volumes:
+      - "./docker/jaeger/data:/etc/jaeger/jaeger-ui.json"
+    restart: always
+    ports:
+      - "5775:5775/udp"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+      - "14250:14250"
+      - "9411:9411"
+    networks:
+      - webapi
     
 networks:
-  website:
+  webapi:
     driver: bridge

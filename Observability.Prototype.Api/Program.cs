@@ -1,3 +1,5 @@
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Prometheus.Prototype.Api;
 using Serilog;
 using Serilog.Sinks.Elasticsearch;
@@ -29,6 +31,20 @@ builder.Host.UseSerilog((context, configuration) =>
         .Configuration(context.Configuration);
 });
 
+builder.Services.AddOpenTelemetry()
+    .WithTracing(builder =>
+    {
+        builder
+            .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("Observability.Prototype"))
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddJaegerExporter(options =>
+            {
+                // not needed, it's the default
+                options.AgentHost = "jaeger";
+                options.AgentPort = 6831;
+            });
+    });
 
 var startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);

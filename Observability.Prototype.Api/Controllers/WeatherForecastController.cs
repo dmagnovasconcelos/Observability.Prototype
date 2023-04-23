@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Prometheus.Prototype.Api;
 
 using ILogger = Serilog.ILogger;
@@ -42,7 +43,7 @@ public class WeatherForecastController : ControllerBase
         catch (Exception ex)
         {
             _logger.Error(ex, "Something bad happened");
-            return StatusCode(500, ex.Message);
+            throw;
         }
     }
 
