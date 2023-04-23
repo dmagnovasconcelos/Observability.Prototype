@@ -1,1 +1,1 @@
-# Prometheus.Prototype
+# Observability.Prototype
